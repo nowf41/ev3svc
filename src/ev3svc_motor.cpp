@@ -2,11 +2,15 @@
 #include "ev3svc_motor.h"
 #include "ev3svc_common.h"
 
+#include <stdlib.h>
+#include <math.h>
+
 // === Static variables ===
 
-static brickinfo_t _brick_info;
+static bool is_initialized = false;
+static ev3svc::brickinfo_t _brick_info;
 const static volatile uint8_t* motor_ready;
-const static volatile motor_data_t* motor_data;
+static ev3svc::motor_data_t* motor_data;
 
 static ev3svc::kMotorType _states[4] = {
   ev3svc::kMotorType::NONE,
@@ -60,6 +64,7 @@ inline void _ev3svc_motor_initialize() noexcept {
 
 // === ev3svc::Motor implementation ===
 ev3svc::Motor::Motor(kMotorPort port, kMotorType type) noexcept : port_(port), type_(type) {
+  if (!is_initialized) _ev3svc_motor_initialize(), is_initialized = true;
   switch (type) {
     case kMotorType::NONE:
       assert(false); // this is an exceptional case: the program must not keep running if this happens.
@@ -118,11 +123,11 @@ void ev3svc::Motor::set_power(int power) const noexcept {
   }
 }
 
-ERROR_CODE ev3svc::Motor::run_angle_instant(unsigned int power, int angle, kMotorStopMode mode) const noexcept {
+ev3svc::ERROR_CODE ev3svc::Motor::run_angle_instant(unsigned int power, int angle, kMotorStopMode mode) const noexcept {
 #ifndef EV3SVC_SKIP_UNSIGNED_CHECK
   checkparam(!does_top_bit_stand(power));
 #endif
-  if (angle == 0) return;
+  if (angle == 0) return ERROR_CODE::SUCCESS;
   if (power > 100) power = 100;
 
   if (type_ == kMotorType::UNADJUSTED_LARGE || type_ == kMotorType::UNADJUSTED_MEDIUM) {
@@ -186,7 +191,7 @@ ev3svc::ERROR_CODE ev3svc::Motor::run_time(int power, unsigned int time_ms, kMot
   if (power > 100) power = 100;
   else if (power < -100) power = -100;
 
-  int step1_time = MOTOR_FULL_SPEEDING_TIME_MS * power / 100;
+  unsigned int step1_time = MOTOR_FULL_SPEEDING_TIME_MS * abs(power) / 100;
   if (step1_time * 2 > time_ms) {
     power = time_ms / 2 * 100 / MOTOR_FULL_SPEEDING_TIME_MS;
     step1_time = time_ms / 2;
@@ -213,11 +218,8 @@ bool ev3svc::Motor::is_done() const noexcept {
   return ((*motor_ready & (1 << static_cast<int>(port_))) == 0);
 }
 
-void ev3svc::Motor::wait_for_complete() const noexcept {
-  while (!is_done()) tslp_tsk(1 * 1000);
-}
-
 ev3svc::MotorPair::MotorPair(ev3svc::kMotorPort port_l, ev3svc::kMotorType type_l, ev3svc::kMotorPort port_r, ev3svc::kMotorType type_r) : port_l_(port_l), port_r_(port_r), type_l_(type_l), type_r_(type_r) {
+  if (!is_initialized) _ev3svc_motor_initialize(), is_initialized = true;
   assert(port_l != port_r && is_adjusted_motor_type(type_l) && is_adjusted_motor_type(type_r)); // only adjusted motors are supported to sync
   _states[static_cast<int>(port_l_)] = type_l_;
   ++reference_count[static_cast<int>(port_l_)];
@@ -257,12 +259,10 @@ ev3svc::ERROR_CODE ev3svc::MotorPair::run_time_instant(unsigned int power, unsig
   checkparam(-200 <= turn_rate && turn_rate <= 200);
 
   ev3svc::svc::sync_time_adjusted(port_l_, port_r_, static_cast<int8_t>(power), static_cast<int16_t>(turn_rate), static_cast<uint32_t>(time_ms), mode);
+
+  return ERROR_CODE::SUCCESS;
 }
 
 bool ev3svc::MotorPair::is_done() const noexcept {
   return (*motor_ready & ((1 << static_cast<int>(port_l_)) | (1 << static_cast<int>(port_r_)))) == 0;
-}
-
-void ev3svc::MotorPair::wait_for_complete() const noexcept {
-  while (!is_done()) tslp_tsk(1 * 1000);
 }

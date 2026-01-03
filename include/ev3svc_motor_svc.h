@@ -1,16 +1,11 @@
 #pragma once
-#include "platform_interface_layer.h"
 #include "ev3svc_common.h"
-
+#include "TOPPERS_svc.h"
 #include <stdint.h>
 
 namespace ev3svc {
   namespace svc {
     namespace {
-      inline void call_motor_svc(const void* cmd, uint32_t size) {
-        motor_command(cmd, size);
-      }
-
       struct StepPower {
         uint8_t cmd;
         uint8_t nos;
@@ -302,7 +297,7 @@ namespace ev3svc {
       call_motor_svc(&cmd, sizeof(cmd));
     }
 
-    inline ER get_brick_info(brickinfo_t* info) {
+    inline int32_t get_brick_info(ev3svc::brickinfo_t* info) {
       return fetch_brick_info(info);
     }
   }

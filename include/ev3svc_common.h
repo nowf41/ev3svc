@@ -1,17 +1,10 @@
 #pragma once
 
 #include <stdint.h>
+#include "TOPPERS_svc.h"
 
 namespace ev3svc {
-  enum class kMotorType {
-    NONE = (int)kPortTypeInternal::TYPE_NONE,
-    LARGE = (int)kPortTypeInternal::TYPE_TACHO, // NXT motor & EV3 L motor
-    MEDIUM = (int)kPortTypeInternal::TYPE_MINITACHO, // EV3 M motor
-    UNADJUSTED_LARGE = 200, // this value must not handed to supervisor-call.
-    UNADJUSTED_MEDIUM = 201, // this value must not handed to supervisor-call.
-  };
-  
-  enum class kMotorPort {
+    enum class kMotorPort {
     A = 0,
     B = 1,
     C = 2,
@@ -46,6 +39,14 @@ namespace ev3svc {
   enum class kMotorStopMode {
     COAST = 0,
     BREAK = 1
+  };
+  
+  enum class kMotorType {
+    NONE = (int)kPortTypeInternal::TYPE_NONE,
+    LARGE = (int)kPortTypeInternal::TYPE_TACHO, // NXT motor & EV3 L motor
+    MEDIUM = (int)kPortTypeInternal::TYPE_MINITACHO, // EV3 M motor
+    UNADJUSTED_LARGE = 200, // this value must not handed to supervisor-call.
+    UNADJUSTED_MEDIUM = 201, // this value must not handed to supervisor-call.
   };
 
   template <typename T>

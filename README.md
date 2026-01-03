@@ -1,31 +1,19 @@
 # ev3svc
-This project is an alternative (not so tiny) wrapper for the EV3 driver, written in C++.
-It is intented to be used as an alternative API for userspace applications.
-This library is almost header-only except for minimal classes that initializes state of this library.
-This library can competing with ev3api library, so don't use **motor apis** of ev3api.h, and use this library completely instead.
+このプロジェクトはEV3RTのドライバラッパAPIであり、既存のドライバラッパであるev3apiの代替となることを目的として作成されました。
+このライブラリはev3apiと競合するため、特に同分野での混用は避けるべきです。(例: ev3svc::Motorとev3_motor_xxx関数の混用など)
 
-## How to use
-1. Paste everything to `sdk/common/library/ev3svc/` directory. (create it)
-1. Add `-I$(EV3RT_ROOT)/sdk/common/library/ev3svc/include` to your `CXXFLAGS` in `Makefile.inc`.
-1. Insert a row into `app_common.cfg`:
+## 使用方法
+1. すべてのファイルを`hrp3/sdk/common/library/sv3svc`フォルダ内に配置してください。(必要があればフォルダを作成してください)
+2. このライブラリを利用するworkspace内のアプリケーションの`Makefile.inc`に、以下の一行を追記してください。
 ```
-INCLUDE("ev3api.cfg");
-INCLUDE("ev3svc.cfg"); <-- Add this line
-
-ATT_MOD("log_output.o");
-ATT_MOD("vasyslog.o");
-ATT_MOD("t_perror.o");
-ATT_MOD("strerror.o");
-ATT_MOD("libc.a");
+include $(EV3RT_SDK_LIB_DIR)/ev3svc/Makefile
 ```
+3. `ev3svc.h`を`#include`してください。
 
-## Natural Language
-We mainly use English for primary code comments, but some parts might be written in Japanese.
-We're working on making Japanese documentation along English ones. Please feel free to contribute if you can help.
-We don't limit language for discussions in issues, pull requests, etc., but English or Japanese is preferred.
+## ライセンス
+ - "TOPPERS_"からファイル名が始まるすべてのファイルに対して、各ファイル冒頭に記載されているTOPPERSライセンスが適用されます。
+ - 上記ファイルに含まれるうち、TOPPERSにより記述されたコードを除き、著作者が追加・変更した部分については、著作者は著作権(財産権)を行使しません。ただし、これはTOPPERSライセンスの適用を妨げません。
+ - "TOPPERS_"からファイル名が始まらないすべてのファイルに対して、MITライセンスが適用されます。
 
-## License
-This project is licenced under MIT License. See the LICENSE file for details.
-
-## Thanks
-This library depends on toppers/ev3rt. We really appreciate all the contributors of toppers/ev3rt.
+## 謝辞
+このライブラリはtoppers/ev3rtに依存しています。toppers/ev3rtプロジェクト、及びそのすべての貢献者に感謝の意を表します。

@@ -5,9 +5,9 @@
 #include <cmath>
 
 #ifdef EV3SVC_TERMINATE_TASK_ON_INVALID_PARAMETER
-#define checkparam(cond) assert(cond)
+#define checkparam(cond) assert((cond))
 #else
-#define checkparam(cond) if (!cond) {return ERROR_CODE::INVALID_PARAM;} 
+#define checkparam(cond) if (!(cond)) {return ERROR_CODE::INVALID_PARAM;} 
 #endif
 
 /// @brief Must be called before using ev3svc::Motor class.
