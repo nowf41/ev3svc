@@ -3,7 +3,7 @@
 このライブラリはev3apiと競合するため、特に同分野での混用は避けるべきです。(例: ev3svc::Motorとev3_motor_xxx関数の混用など)
 
 ## 使用方法
-1. すべてのファイルを`hrp3/sdk/common/library/sv3svc`フォルダ内に配置してください。(必要があればフォルダを作成してください)
+1. すべてのファイルを`hrp3/sdk/common/library/ev3svc`フォルダ内に配置してください。(必要があればフォルダを作成してください)
 2. このライブラリを利用するworkspace内のアプリケーションの`Makefile.inc`に、以下の一行を追記してください。
 ```
 include $(EV3RT_SDK_LIB_DIR)/ev3svc/Makefile
