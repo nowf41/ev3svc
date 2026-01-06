@@ -33,7 +33,7 @@ namespace ev3svc {
     /// @brief Stops the motor.
     /// @param mode the stop mode to use
     void stop(kMotorStopMode mode) const noexcept;
-    
+
     /// @brief Gets the current tacho count of the motor.
     /// @return The current tacho count
     int get_tacho_count() const noexcept;
@@ -85,9 +85,6 @@ namespace ev3svc {
     /// @brief Checks if the motor has completed its current operation.
     /// @return True if the motor is done, false otherwise.
     bool is_done() const noexcept;
-
-    /// @brief Waits until the motor has completed its current operation.
-    void wait_for_complete() const noexcept;
   };
 
   class MotorPair {
@@ -95,7 +92,7 @@ namespace ev3svc {
     ev3svc::kMotorPort port_r_;
     ev3svc::kMotorType type_l_;
     ev3svc::kMotorType type_r_;
-    
+
     public:
     MotorPair(ev3svc::kMotorPort port_l, ev3svc::kMotorType type_l, ev3svc::kMotorPort port_r, ev3svc::kMotorType type_r);
 
@@ -120,8 +117,5 @@ namespace ev3svc {
     /// @brief Checks if the motors have completed its current operation.
     /// @return True if both motors are done, false otherwise.
     bool is_done() const noexcept;
-
-    /// @brief Waits until the motors have completed its current operation.
-    void wait_for_complete() const noexcept;
   };
 }

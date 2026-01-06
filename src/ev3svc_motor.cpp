@@ -51,7 +51,7 @@ static bool is_adjusted_motor_type(ev3svc::kMotorType type) {
   }
 }
 
-const int MOTOR_FULL_SPEEDING_TIME_MS = 300;
+constexpr int MOTOR_FULL_SPEEDING_TIME_MS = 300;
 
 inline void _ev3svc_motor_initialize() noexcept {
   ev3svc::svc::set_type(ev3svc::kMotorType::NONE, ev3svc::kMotorType::NONE, ev3svc::kMotorType::NONE, ev3svc::kMotorType::NONE);
@@ -149,11 +149,11 @@ ev3svc::ERROR_CODE ev3svc::Motor::run_angle(unsigned int power, int angle, kMoto
   int step1_need_time = MOTOR_FULL_SPEEDING_TIME_MS * power / 100; // <=300
   int step1_target_speed = _get_motor_max_speed(type_); // <= 2000
   int step1_need_angle = step1_need_time * step1_target_speed / 2 / 1000; // integral
-  if (step1_need_angle * 2 < angle) {
+  if (step1_need_angle * 2 > abs(angle)) {
     // adjust power
-    int adjusted_power = static_cast<int>(std::round(sqrt(abs(angle) * 100. / MOTOR_FULL_SPEEDING_TIME_MS))); // integral
+    int adjusted_power = sqrt(10000 * abs(angle) / _get_motor_max_speed(type_) / MOTOR_FULL_SPEEDING_TIME_MS);
     power = adjusted_power;
-    step1_need_angle = angle / 2;
+    step1_need_angle = abs(angle) / 2;
   }
 
   // マイナス方向への進行もこのコードでOK.
@@ -193,7 +193,7 @@ ev3svc::ERROR_CODE ev3svc::Motor::run_time(int power, unsigned int time_ms, kMot
 
   unsigned int step1_time = MOTOR_FULL_SPEEDING_TIME_MS * abs(power) / 100;
   if (step1_time * 2 > time_ms) {
-    power = time_ms / 2 * 100 / MOTOR_FULL_SPEEDING_TIME_MS;
+    power = static_cast<long long>(time_ms * 100) / static_cast<long long>(2 * MOTOR_FULL_SPEEDING_TIME_MS);
     step1_time = time_ms / 2;
   }
 
