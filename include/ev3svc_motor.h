@@ -118,4 +118,19 @@ namespace ev3svc {
     /// @return True if both motors are done, false otherwise.
     bool is_done() const noexcept;
   };
+
+  class DriveBase {
+    ev3svc::MotorPair& pair_;
+    double wheel_diameter_;
+    double axle_track_;
+
+    public:
+    DriveBase(ev3svc::MotorPair& pair, double wheel_diameter, double axle_track);
+    ~DriveBase() noexcept;    
+    ERROR_CODE straight(double mm); // 距離で直進
+    ERROR_CODE straight_t(double time_ms); // 時間で直進
+    ERROR_CODE turn(double deg); // 角度で回転
+    ERROR_CODE steer(int left_power, int right_power, double mm); // 距離でステアリング
+    ERROR_CODE steer_time(int left_power, int right_power, double time_ms); // 時間でステアリング
+  }
 }
